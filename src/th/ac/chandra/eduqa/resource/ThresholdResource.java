@@ -130,7 +130,7 @@ public class ThresholdResource extends BaseResource {
 						else if(serviceName.equals(ServiceConstant.THRESHOLD_SEARCH)){
 							Paging page = xsource.getPaging(); 
 							@SuppressWarnings("rawtypes")
-							List result = (List) service.searchThreshold(domain, page,xsource.getKeySearch());
+							List result = (List) service.searchThreshold(domain, page,xsource.getKeySearch(),xsource.getActive());
 							if (result != null && result.size() == 2) {
 								java.util.ArrayList<Threshold> domains = (java.util.ArrayList<Threshold>) result.get(0); //get dataList
 								String domains_size = (String) result.get(1);  // get meta

@@ -21,6 +21,7 @@ public class ThresholdModel extends ImakeXML implements Serializable{
 	private String UpdatedBy;
 	private Timestamp createdDate;
 	private Timestamp updatedDate;
+	private String active;
 
 	public ThresholdModel() {
 	}
@@ -111,6 +112,14 @@ public class ThresholdModel extends ImakeXML implements Serializable{
 
 	public void setUpdatedDate(Timestamp updatedDate) {
 		this.updatedDate = updatedDate;
+	}
+
+	public String getActive() {
+		return active;
+	}
+
+	public void setActive(String active) {
+		this.active = active;
 	}
 	
 	

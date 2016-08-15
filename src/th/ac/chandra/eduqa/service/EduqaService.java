@@ -99,7 +99,7 @@ public interface EduqaService {
 	public Integer deleteCds(Cds persistentInstance) throws DataAccessException;
 	public Integer updateCds(Cds transientInstance) throws DataAccessException ;
 	@SuppressWarnings("rawtypes")
-	public  List searchCds(Cds persistentInstance,Paging pagging,String keySearch)throws DataAccessException  ;
+	public  List searchCds(Cds persistentInstance,Paging pagging,String keySearch,String keyListStatus)throws DataAccessException;
 	
 	//kpi
 	public Kpi findKpiById(Integer KpiId)throws DataAccessException  ;
@@ -109,7 +109,7 @@ public interface EduqaService {
 	public Integer deleteKpi(Kpi persistentInstance) throws DataAccessException;
 	public Integer updateKpi(Kpi transientInstance) throws DataAccessException ;
 	@SuppressWarnings("rawtypes")
-	public  List searchKpi(Kpi persistentInstance,Paging pagging,String keySearch)throws DataAccessException  ;
+	public  List searchKpi(Kpi persistentInstance,Paging pagging,String keySearch, String keyListStatus)throws DataAccessException  ;
 	
 	// criteria 
 	public List searchCriteriaGroup(Paging pagging,String keySearch) throws DataAccessException;
@@ -141,7 +141,8 @@ public interface EduqaService {
 	public Integer deleteThreshold(Threshold persistentInstance) throws DataAccessException;
 	public Threshold findThresholdById(Integer ThresholdId) throws DataAccessException;
 	@SuppressWarnings("rawtypes") 
-	public List searchThreshold(Threshold persistentInstance, Paging pagging, String keySearch) throws DataAccessException;
+	//public List searchThreshold(Threshold persistentInstance, Paging pagging, String keySearch) throws DataAccessException;
+	public List searchThreshold(Threshold persistentInstance, Paging pagging, String keySearch,String keyListStatus) throws DataAccessException;
 	
 	//SYS YEAR
 	public SysYear getSysYear()  throws DataAccessException;

@@ -77,7 +77,9 @@ public class Cds implements Serializable {
 	
 	@Column(name="UPDATED_BY")
 	private String updatedBy;
-
+	
+	@Column(name="ACTIVE")
+	private String active;
 	
 	public Cds() {
 	
@@ -201,6 +203,12 @@ public class Cds implements Serializable {
 	}
 	public void setUpdatedBy(String updatedBy) {
 		this.updatedBy = updatedBy;
+	}
+	public String getActive() {
+		return active;
+	}
+	public void setActive(String active) {
+		this.active = active;
 	}
 
 	

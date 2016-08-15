@@ -134,7 +134,7 @@ public class KpiResource extends BaseResource {
 							Paging page = xsource.getPaging(); 
 							@SuppressWarnings("rawtypes")
 							ImakeResultMessage imakeMessage = new ImakeResultMessage();
-							List result = (List) service.searchKpi(domain, page,xsource.getKeySearch());
+							List result = (List) service.searchKpi(domain, page,xsource.getKeySearch(), xsource.getActive());
 							if (result != null) {
 								ArrayList<KpiModel> kpis = (ArrayList<KpiModel>) result.get(0); //get dataList
 								String meta = (String) result.get(1);  

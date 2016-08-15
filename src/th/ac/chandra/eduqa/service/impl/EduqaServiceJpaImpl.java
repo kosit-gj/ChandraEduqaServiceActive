@@ -355,8 +355,8 @@ public class EduqaServiceJpaImpl  implements EduqaService {
 
 	@Override
 	public List<?> searchKpi(Kpi persistentInstance, Paging pagging,
-			String keySearch) throws DataAccessException {
-		return  repository.searchKpi(persistentInstance,pagging,keySearch);
+			String keySearch, String keyListStatus) throws DataAccessException {
+		return  repository.searchKpi(persistentInstance,pagging,keySearch,keyListStatus);
 	}
 	@Override
 	public List<?> getCdsMapWithKpi(CdsResultModel model) throws DataAccessException {
@@ -384,8 +384,9 @@ public class EduqaServiceJpaImpl  implements EduqaService {
 
 	@Override
 	public List<?> searchCds(Cds persistentInstance, Paging pagging,
-			String keySearch) throws DataAccessException {
-		return  repository.searchCds(persistentInstance,pagging,keySearch);
+			String keySearch, String keyListStatus) throws DataAccessException {
+		//return  repository.searchCds(persistentInstance,pagging,keySearch);
+		return repository.searchCds(persistentInstance,pagging,keySearch,keyListStatus);
 	}
 
 	@Override
@@ -551,9 +552,10 @@ public class EduqaServiceJpaImpl  implements EduqaService {
 	}
 
 	@Override
-	public List searchThreshold(Threshold persistentInstance, Paging pagging,String keySearch)
+	public List searchThreshold(Threshold persistentInstance, Paging pagging,String keySearch,String keyListStatus)
 			throws DataAccessException {
-		return  repository.searchThreshold(persistentInstance,pagging,keySearch);
+		//return  repository.searchThreshold(persistentInstance,pagging,keySearch);
+		return  repository.searchThreshold(persistentInstance,pagging,keySearch,keyListStatus);
 	}
 //=====| END: THRESHOLD |=================================================================================//
 	

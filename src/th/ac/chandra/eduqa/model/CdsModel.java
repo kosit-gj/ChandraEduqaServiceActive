@@ -32,6 +32,7 @@ public class CdsModel extends ImakeXML implements Serializable{
 	private String levelDesc;
 	private String createdBy;
 	private String updatedBy;
+	private String active;
 
 	public CdsModel() {
 	}
@@ -200,4 +201,14 @@ public class CdsModel extends ImakeXML implements Serializable{
 	public void setUpdatedBy(String updatedBy) {
 		this.updatedBy = updatedBy;
 	}
+
+	public String getActive() {
+		return active;
+	}
+
+	public void setActive(String active) {
+		this.active = active;
+	}
+	
+	
 }

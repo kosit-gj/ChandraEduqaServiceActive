@@ -159,7 +159,7 @@ public class CdsResource extends BaseResource {
 						else if(serviceName.equals(ServiceConstant.CDS_SEARCH)){
 							Paging page = xsource.getPaging(); 
 							@SuppressWarnings("rawtypes")
-							List result = (List) service.searchCds(domain, page,xsource.getKeySearch());
+							List result = (List) service.searchCds(domain, page,xsource.getKeySearch(),xsource.getActive());
 							ImakeResultMessage imakeMessage = new ImakeResultMessage();
 							ImakeMessage msg = new ImakeMessage();
 							if (result != null) {

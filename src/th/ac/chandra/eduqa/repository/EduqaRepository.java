@@ -135,21 +135,17 @@ public class EduqaRepository   {
 	public List searchKpiLevel(KpiLevel persistentInstance,
 			Paging pagging, String keySearch,Integer keyListStatus) throws DataAccessException {
 		StringBuffer sb = new StringBuffer("");
-		
-		//System.out.println("keyListStatus22222222222222222="+keyListStatus);
-		
-		sb.append(" where p.levelNo>0 ");
-		if ((keySearch != null && keySearch.trim().length() > 0) || (keyListStatus != null)) {
-			
-			if(keyListStatus==99){
-				sb.append(" and  p.desc like '%" + keySearch.trim()+ "%'");
-			}else{
-				sb.append(" and  p.desc like '%" + keySearch.trim()
-					+ "%'  and kpi_level_active="+keyListStatus+"");
-			}
+		sb.append(" where p.levelNo > 0 ");
+		if ((keySearch != null && keySearch.trim().length() > 0)) {
+			sb.append(" and  p.desc like '%" + keySearch.trim()+ "%'");
 		}
+		if(keyListStatus != null && keyListStatus.toString().trim().length() > 0){
+			if(!keyListStatus.toString().equals("99")){
+				sb.append(" and kpi_level_active="+keyListStatus);
+			}			
+		}
+
 		ArrayList transList = new ArrayList();
-		//entityManager.createNativeQuery(arg0, arg1);
 		Query query = entityManager.createQuery(	
 				" select p from KpiLevel p " + sb.toString() 
 				,	KpiLevel.class);
@@ -215,20 +211,26 @@ public class EduqaRepository   {
 				throws DataAccessException {
 			return entityManager.find(KpiGroup.class, kpiGroupId);
 		}
-		public List searchKpiGroup(KpiGroup persistentInstance,
+		
+		public List searchKpiGroup(KpiGroup persistentInstance, 
 				Paging pagging, String keySearch,String keyListStatus) throws DataAccessException {
 			StringBuffer sbGrp = new StringBuffer("");
-			System.out.println("0keyListStatus"+keyListStatus);
-			if (keySearch != null && keySearch.trim().length() > 0 || keyListStatus != null && keyListStatus.trim().length() > 0) {
-				//System.out.println("1keyListStatus"+keyListStatus);
+			/*if (keySearch != null && keySearch.trim().length() > 0 || keyListStatus != null && keyListStatus.trim().length() > 0) {
 				if(keyListStatus.equals("99")){
-					//System.out.println("2keyListStatus11"+keyListStatus);
 					sbGrp.append(" and g.kpi_group_name like '%" + keySearch.trim() + "%' ");
 				}else{
-					//System.out.println("3keyListStatus22"+keyListStatus);
 					sbGrp.append(" and g.kpi_group_name like '%" + keySearch.trim() + "%'  and g.active='"+keyListStatus+"'");
 				}
-			}		
+			}*/
+			if(keySearch != null && keySearch.trim().length() > 0){
+				sbGrp.append(" and g.kpi_group_name like '%" + keySearch.trim() + "%' ");
+			}
+			if(keyListStatus != null && keyListStatus.trim().length() > 0){ 
+				if(!keyListStatus.equals("99")){
+					sbGrp.append(" and g.active='"+keyListStatus+"'");
+				}				
+			}
+			
 			Query query = entityManager.createNativeQuery(
 					" SELECT g.kpi_group_id,g.academic_year "+
 					" ,g.kpi_group_name,g.kpi_group_short_name "+
@@ -241,7 +243,7 @@ public class EduqaRepository   {
 					sbGrp.toString()+
 					" order by g.kpi_group_id");
 			//System.out.println("query11"+query);
-			query.setFirstResult((pagging.getPageNo()-1) * pagging.getPageSize()); 
+			query.setFirstResult((pagging.getPageNo()-1) * pagging.getPageSize());
 			query.setMaxResults(pagging.getPageSize());	
 			
 			List<Object[]> results = query.getResultList();
@@ -318,15 +320,16 @@ public class EduqaRepository   {
 							+ persistentInstance.getGroupTypeId()).executeUpdate();
 			return deletedCount;		
 		}
+		
 		public KpiGroupType findKpiGroupTypeById(Integer kpiGroupTypeId)
 				throws DataAccessException {
 			return entityManager.find(KpiGroupType.class, kpiGroupTypeId);
 		}
+		
 		public List searchKpiGroupType(KpiGroupType persistentInstance,
-				Paging pagging, String keySearch,String keyListStatus) throws DataAccessException {
-			System.out.println("adsfasdfasdfadsfkeyListStatus="+keyListStatus);
+				Paging pagging, String keySearch, String keyListStatus) throws DataAccessException {
 			StringBuffer sb = new StringBuffer("");
-			if (keySearch != null && keySearch.trim().length() > 0 || keyListStatus != null && keyListStatus.trim().length() > 0) {
+			/*if (keySearch != null && keySearch.trim().length() > 0 || keyListStatus != null && keyListStatus.trim().length() > 0) {
 				if(keyListStatus.equals("99")){
 					sb.append(" where  p.groupTypeName like '%" + keySearch.trim()
 						+ "%' ");
@@ -334,17 +337,26 @@ public class EduqaRepository   {
 					sb.append(" where  p.groupTypeName like '%" + keySearch.trim()
 					+ "%'  and active='"+keyListStatus+"'");
 				}
+			}*/
+			if(keySearch != null && keySearch.trim().length() > 0){
+				sb.append(" and p.groupTypeName like '%" + keySearch.trim() + "%' ");
 			}
+			if(keyListStatus != null && keyListStatus.trim().length() > 0){ 
+				if(!keyListStatus.equals("99")){
+					sb.append(" and active='"+keyListStatus+"'");
+				}				
+			}			
+			
 			ArrayList transList = new ArrayList();
 			Query query = entityManager.createQuery(	
-					" select p from KpiGroupType p " + sb.toString() 
+					" select p from KpiGroupType p where 1=1" + sb.toString() 
 					,	KpiGroupType.class);
 			query.setFirstResult((pagging.getPageNo()-1) * pagging.getPageSize()); 
 			query.setMaxResults(pagging.getPageSize());	
 			transList.add(query.getResultList());
 
 			query = entityManager
-					.createQuery("select count(p) from KpiGroupType p "
+					.createQuery("select count(p) from KpiGroupType p where 1=1"
 							+ sb.toString());
 			long count = (Long) query.getSingleResult();
 			transList.add(String.valueOf(count));
@@ -405,27 +417,27 @@ public class EduqaRepository   {
 		}
 		
 		public List searchKpiType(KpiType persistentInstance,
-				Paging pagging, String keySearch,String keyListStatus) throws DataAccessException {
+				Paging pagging, String keySearch, String keyListStatus) throws DataAccessException {
 			StringBuffer sb = new StringBuffer("");
-			if ((keySearch != null && keySearch.trim().length() > 0) || (keyListStatus != null && keyListStatus.trim().length() > 0)) {
-				if(keyListStatus.equals("99")){
-					sb.append(" where  p.typeName like '%" + keySearch.trim()
-					+ "%' ");
-				}else{
-				sb.append(" where  p.typeName like '%" + keySearch.trim()
-						+ "%'  and p.active='"+keyListStatus+"'");
+			if ((keySearch != null && keySearch.trim().length() > 0)) {
+				sb.append(" and p.typeName like '%" + keySearch.trim() + "%' ");
+			}
+			if(keyListStatus != null && keyListStatus.trim().length() > 0){
+				if(!keyListStatus.equals("99")){
+					sb.append(" and p.active = " + keyListStatus);
 				}
 			}
+			
 			ArrayList transList = new ArrayList();
 			Query query = entityManager.createQuery(	
-					" select p from KpiType p " + sb.toString() 
+					" select p from KpiType p where 1 = 1" + sb.toString() 
 					,	KpiType.class);
 			query.setFirstResult((pagging.getPageNo()-1) * pagging.getPageSize()); 
 			query.setMaxResults(pagging.getPageSize());	
 			transList.add(query.getResultList());
 
 			query = entityManager
-					.createQuery("select count(p) from KpiType p "
+					.createQuery("select count(p) from KpiType p where 1 = 1"
 							+ sb.toString());
 			long count = (Long) query.getSingleResult();
 			transList.add(String.valueOf(count));
@@ -485,23 +497,22 @@ public class EduqaRepository   {
 	public List searchKpiUom(KpiUom persistentInstance, Paging pagging,
 			String keySearch,String keyListStatus) throws DataAccessException {
 		StringBuffer sb = new StringBuffer("");
-		
-		if ((keySearch != null && keySearch.trim().length() > 0) || (keyListStatus != null && keyListStatus.trim().length() > 0)) {
-			
-			if(keyListStatus.equals("99")){
-				sb.append(" where  p.uomName like '%" + keySearch.trim() + "%' ");
-			}else{
-				sb.append(" where  p.uomName like '%" + keySearch.trim() + "%' and active='"+keyListStatus+"' ");
-			}
-			
+		if ((keySearch != null && keySearch.trim().length() > 0)) {
+			sb.append(" and p.uomName like '%" + keySearch.trim() + "%' ");			
 		}
+		if(keyListStatus != null && keyListStatus.trim().length() > 0){
+			if(!keyListStatus.toString().equals("99")){
+				sb.append(" and active='"+keyListStatus+"' ");
+			}			
+		}
+		
 		ArrayList transList = new ArrayList();
 		Query query = entityManager.createQuery(
-				" select p from KpiUom p " + sb.toString(), KpiUom.class);
+				" select p from KpiUom p where 1=1 " + sb.toString(), KpiUom.class);
 		query.setFirstResult((pagging.getPageNo() - 1) * pagging.getPageSize());
-		//query.setMaxResults(pagging.getPageSize());
+		query.setMaxResults(pagging.getPageSize());
 		transList.add(query.getResultList());
-		query = entityManager.createQuery("select count(p) from KpiUom p "
+		query = entityManager.createQuery("select count(p) from KpiUom p where 1=1 "
 				+ sb.toString());
 		long count = (Long) query.getSingleResult();
 		transList.add(String.valueOf(count));
@@ -560,21 +571,21 @@ public class EduqaRepository   {
 			return entityManager.find(KpiStruc.class, kpiStrucId);
 		}
 		
-		public List searchKpiStruc(KpiStruc persistentInstance,
+		public List searchKpiStruc(KpiStruc persistentInstance, 
 				Paging pagging, String keySearch,String keyListStatus) throws DataAccessException {
 			StringBuffer sbGrp = new StringBuffer("");
-			
-			if ((keySearch != null && keySearch.trim().length() > 0) || (keyListStatus != null && keyListStatus.trim().length() > 0 )) {
-				if(keyListStatus.equals("99")){
-					sbGrp.append("and ks.kpi_structure_name like '%" + keySearch.trim() + "%' ");
-				}else{
-					sbGrp.append("and ks.kpi_structure_name like '%" + keySearch.trim() + "%' and ks.active='"+keyListStatus+"'");
-				}
+			if(keySearch != null && keySearch.trim().length() > 0){
+				sbGrp.append("and ks.kpi_structure_name like '%" + keySearch.trim() + "%' ");
 			}
-			
+			if(keyListStatus != null && keyListStatus.toString().trim().length() > 0){
+				if(!keyListStatus.toString().equals("99")){
+					sbGrp.append("and ks.active='"+keyListStatus+"'");
+				}			
+			}
 			if( persistentInstance.getGroupId() != null ){
 				sbGrp.append("and ks.kpi_group_id = " + persistentInstance.getGroupId()  );
 			}
+			
 			Query query = entityManager.createNativeQuery(
 					" select ks.academic_year,ks.kpi_structure_id, ks.kpi_structure_name "+
 						" ,ks.kpi_group_id, kg.kpi_group_name  "+
@@ -971,14 +982,15 @@ public class EduqaRepository   {
 	
 	@SuppressWarnings("rawtypes")
 	public List searchKpi(Kpi domain,
-			Paging pagging, String keySearch) throws DataAccessException {
+			Paging pagging, String keySearch, String keyListStatus) throws DataAccessException {
 		StringBuffer sb = new StringBuffer("");
 		if (keySearch == null || keySearch.trim().length() <= 0) {
 			keySearch = "";
 		}
 		sb.append(" where  kpi.kpi_name like '%" + keySearch.trim()+ "%' and kpi.kpi_level_id="+domain.getLevelId());
 		if(domain.getStructureId()!=null){ sb.append(" and kpi.kpi_structure_id="+domain.getStructureId()); }
-		if(domain.getGroupId()!=null ){	 sb.append(" and kpi.kpi_group_id="+domain.getGroupId());		}
+		if(domain.getGroupId()!=null ){	 sb.append(" and kpi.kpi_group_id="+domain.getGroupId()); }
+		if(keyListStatus != null && keyListStatus != "99"){ sb.append(" and kpi.active ="+domain.getActive()); }
 		String sql = "select s.kpi_structure_id "+
 		" ,s.kpi_structure_name as structureName"+
 		" ,kpi.kpi_id"+
@@ -1088,24 +1100,31 @@ public class EduqaRepository   {
 	public Cds findCdsById(Integer cdsId){
 		return entityManager.find(Cds.class, cdsId);
 	}
+	
 	@SuppressWarnings("rawtypes")
 	public List searchCds(Cds persistentInstance,
-			Paging pagging, String keySearch){
+			Paging pagging, String keySearch,String keyListStatus) throws DataAccessException {
 		StringBuffer sb = new StringBuffer("");
-		if (keySearch != null && keySearch.trim().length() > 0) {
-			sb.append(" where cds.cds_name like '%" + keySearch.trim()
-					+ "%' ");
+		if(keySearch != null && keySearch.trim().length() > 0){
+			sb.append("and cds.cds_name like '%" + keySearch.trim() + "%' ");
 		}
+		if(keyListStatus != null && keyListStatus.toString().trim().length() > 0){
+			if(!keyListStatus.toString().equals("99")){
+				sb.append(" and cds.active='"+keyListStatus+"'");
+			}			
+		}
+		
 		Query query =  entityManager.createNativeQuery(
-				" SELECT cds_id,cds_name,lv.kpi_level_name "+
+				" SELECT cds_id,cds_name,lv.kpi_level_name,cds.active "+
 				" FROM cds left join kpi_level lv "+
-				" on cds.kpi_level_id = lv.kpi_level_id "  + sb.toString() + 
+				" on cds.kpi_level_id = lv.kpi_level_id where 1=1 " + sb.toString() + 
 				" order by cds_id "
 				);
 		Query countQuery =  entityManager.createNativeQuery(
 				" SELECT count(*) "+
 				" FROM cds left join kpi_level lv "+
-				" on cds.kpi_level_id = lv.kpi_level_id "  + sb.toString() 	);
+				" on cds.kpi_level_id = lv.kpi_level_id where 1=1 "  + sb.toString() 
+				);
 		query.setFirstResult((pagging.getPageNo()-1) * pagging.getPageSize()); 
 		query.setMaxResults(pagging.getPageSize());	
 		List<Object[]> results = query.getResultList();
@@ -1114,7 +1133,8 @@ public class EduqaRepository   {
 			CdsModel cds = new CdsModel();
 		    cds.setCdsId( (Integer) result[0]); 
 		    cds.setCdsName( (String) result[1]); 
-		    cds.setLevelDesc( (String)result[2] ); // map kpi id
+		    cds.setLevelDesc( (String)result[2]);
+		    cds.setActive( (String) result[3]);// map kpi id
 		    cdsList.add(cds);
 		}
 		ArrayList transList = new ArrayList();
@@ -1659,7 +1679,7 @@ public class EduqaRepository   {
 		return entityManager.find(Threshold.class, kpiThresholdId);
 	}
 
-	public List searchThreshold(Threshold persistentInstance, Paging pagging,
+	/*public List searchThreshold(Threshold persistentInstance, Paging pagging,
 			String keySearch) throws DataAccessException {
 		StringBuffer sb = new StringBuffer("");
 		if (keySearch != null && keySearch.trim().length() > 0) {
@@ -1670,6 +1690,45 @@ public class EduqaRepository   {
 		ArrayList transList = new ArrayList();
 		Query queryTld = entityManager.createQuery(
 				" select p from Threshold p " + sb.toString() + " order by p.beginThreshold", Threshold.class);
+		queryTld.setFirstResult((pagging.getPageNo() - 1) * pagging.getPageSize());
+		queryTld.setMaxResults(pagging.getPageSize());
+		transList.add(queryTld.getResultList());
+		queryTld = entityManager.createQuery("select count(p) from Threshold p "
+				+ sb.toString());
+		long count = (Long) queryTld.getSingleResult();
+		transList.add(String.valueOf(count));
+		return transList;
+	}*/
+	public List searchThreshold(Threshold persistentInstance, Paging pagging,
+			String keySearch,String keyListStatus) throws DataAccessException {
+		StringBuffer sb = new StringBuffer("");
+		
+		////////////////////////////////////////////////////////
+		System.out.println("1test prameter keyListStatus ="+keyListStatus);
+		System.out.println("1test prameter keySearch ="+keySearch);
+		
+		 if ((keySearch != null && keySearch.trim().length() > 0) || ( keyListStatus != null && keyListStatus.trim().length() > 0 )) {
+			 System.out.println("2test prameter keyListStatus ="+keyListStatus);
+				System.out.println("2test prameter keySearch ="+keySearch);
+				 if( keyListStatus.equals( "99" )){
+					 sb.append(" where p.levelId = '" + keySearch.trim()+"' " );
+				 }else{
+					
+					sb.append(" where p.levelId =" + keySearch.trim() +"and p.active='" +keyListStatus+"'" );
+					
+				 }
+			 
+			 }else if(keySearch == null){
+				sb.append(" where p.levelId = 0");
+			}
+		
+		/////////////////////////////////////////////////////////
+		
+		ArrayList transList = new ArrayList();
+		Query queryTld = entityManager.createQuery(
+				" select p from Threshold p " + sb.toString() + " order by p.beginThreshold", Threshold.class);
+				
+		
 		queryTld.setFirstResult((pagging.getPageNo() - 1) * pagging.getPageSize());
 		queryTld.setMaxResults(pagging.getPageSize());
 		transList.add(queryTld.getResultList());

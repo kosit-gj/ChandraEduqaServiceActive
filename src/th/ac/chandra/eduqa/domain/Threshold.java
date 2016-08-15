@@ -21,6 +21,9 @@ public class Threshold implements Serializable {
 	@Column(name="THRESHOLD_ID")
 	private Integer thresholdId;
 	
+	@Column(name="ACTIVE" )
+	private String active;
+	
 	@Column(name="ACADEMIC_YEAR")
 	private Integer academicYear;
 	
@@ -59,6 +62,13 @@ public class Threshold implements Serializable {
 	public void setThresholdId(Integer thresholdId) {
 		this.thresholdId = thresholdId;
 	}
+	
+	public String getActive() {
+		return active;
+		}
+	public void setActive(String active) {
+		this. active = active;
+		}
 
 	public Integer getAcademicYear() {
 		return academicYear;
