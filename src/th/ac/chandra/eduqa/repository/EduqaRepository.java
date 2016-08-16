@@ -3,7 +3,6 @@ package th.ac.chandra.eduqa.repository;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.sql.Connection;
-import java.sql.Date;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
@@ -11,7 +10,6 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Timestamp;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -78,13 +76,10 @@ import th.ac.chandra.eduqa.xstream.common.Paging;
 @Repository("eduqaRepository")
 @Transactional
 public class EduqaRepository   {
-	//private static final String SELECT_QUERY = "select p from JournalPaper p";
 	
 	@Autowired
 	@PersistenceContext(unitName="HibernatePersistenceUnit") 
 	private EntityManager entityManager;
-	
-	private Timestamp currentTimestamp = new Timestamp(Calendar.getInstance().getTime().getTime());
 	
 	@Autowired
 	@PersistenceContext(unitName="HibernatePersistenceLiferayUnit") 
@@ -2172,8 +2167,10 @@ public class EduqaRepository   {
 					+ " ,(select count(*)from eduqa.kpi_result_detail where result_id = kr.result_id and action_flag = 1) as totalAction  "
 					+ " ,kr.criteria_type_id "
 					+ " from  kpi_result kr  "
-					+ " where org_id = "+domain.getOrgId()+" and academic_year = "+domain.getAcademicYear()
-					+ " and kpi_group_id = "+domain.getKpiGroupId()+" and month_id = "+domain.getMonthID() 
+					+ " where org_id = "+domain.getOrgId()+" "
+					+ "and academic_year = "+domain.getAcademicYear()
+					+ " and kpi_group_id = "+domain.getKpiGroupId()+" "
+					+ "and month_id = "+domain.getMonthID() 
 					+ " order by kr.kpi_structure_id,kr.kpi_name";
 			Query query = entityManager.createNativeQuery(sql);
 			//query.setFirstResult((pagging.getPageNo() - 1) * pagging.getPageSize());
@@ -2262,7 +2259,7 @@ public class EduqaRepository   {
 			 *    - ไม่ครบ 12 เดือน ทำการลบข้อมูลเก่าออก แล้วบันทึกใหม่ทั้ง 12 เดือน โดยมี active = 1
 			 *    - มีครบ 12 เดือน ทำการ updata active = 1 
 			 * */
-			Integer success = 0; 
+			Integer success = 0;
 			Query qOrg = entityManager.createQuery("select o from Org o where o.orgId ="+model.getOrgId(),Org.class);
 			Org org = (Org) qOrg.getResultList().get(0);
 			entityManager.flush();
@@ -2272,12 +2269,12 @@ public class EduqaRepository   {
 				for( Integer kid : kidIdList){
 					
 					/*ตรวจสอบว่ามี kpi_result แล้วหรือยัง(โดยมี academicYrat, orgId, kpiId เป็นเงื่อนไข)*/
-					String verifyKpiResult = "SELECT * FROM kpi_result where academic_year = "+model.getAcademicYear()
+					String verifyKpiResult = "SELECT * FROM kpi_result "
+							+ "where academic_year = "+model.getAcademicYear()
 							+" and org_id = "+model.getOrgId()
 							+" and kpi_id = "+kid;
 					Query verifyKpiResultQuery = entityManager.createNativeQuery(verifyKpiResult);
 					Integer rowSize = verifyKpiResultQuery.getResultList().size();
-					//System.out.println("\n --kpiId "+kid+" rowSize--> : "+rowSize+"\n");
 					
 					/*กรณียังไม่มี result ทำการ insert ทั้ง 12 เดือน*/
 					if(rowSize == 0){
@@ -2326,9 +2323,7 @@ public class EduqaRepository   {
 						domain.setKpiTypeId((Integer)ob[10]);
 						domain.setKpiTypeName((String)ob[11]);
 						domain.setKpiTypeShortName((String)ob[12]);
-					//	domain.setCalendarTypeId((Integer)ob[13]);
 						domain.setCalendarTypeName((String)ob[14]);
-					//	domain.setPeriodId((Integer)ob[15]);
 						domain.setPeriodName((String)ob[16]);
 						domain.setKpiUomId((Integer)ob[17]);
 						domain.setKpiUomName((String)ob[18]);
@@ -2420,9 +2415,7 @@ public class EduqaRepository   {
 						domain.setKpiTypeId((Integer)ob[10]);
 						domain.setKpiTypeName((String)ob[11]);
 						domain.setKpiTypeShortName((String)ob[12]);
-					//	domain.setCalendarTypeId((Integer)ob[13]);
 						domain.setCalendarTypeName((String)ob[14]);
-					//	domain.setPeriodId((Integer)ob[15]);
 						domain.setPeriodName((String)ob[16]);
 						domain.setKpiUomId((Integer)ob[17]);
 						domain.setKpiUomName((String)ob[18]);
@@ -2474,94 +2467,6 @@ public class EduqaRepository   {
 				success = 0;
 				System.out.print(ex);
 			}
-			/*
-			Integer success = 0; 
-			Query qOrg = entityManager.createQuery("select o from Org o where o.orgId ="+model.getOrgId(),Org.class);
-			Org org = (Org) qOrg.getResultList().get(0);
-			entityManager.flush();
-			
-			try{
-				List<Integer> kids = model.getKpiIds();
-				for( Integer kid : kids){
-					KpiResult domain = new KpiResult();
-					domain.setResultId(null);
-					domain.setOrgId(model.getOrgId());
-					domain.setOrgName(org.getOrgName());
-					domain.setKpiId(kid); 
-					domain.setAcademicYear(model.getAcademicYear());
-					domain.setCreatedBy(model.getCreatedBy());
-					domain.setUpdatedBy(model.getUpdatedBy());
-					domain.setCreatedDate(model.getCreatedDate());
-					domain.setUpdatedDate(model.getUpdatedDate());
-					String q1 = " SELECT "+
-							" kpi.kpi_id , kpi.kpi_name,kpi.formula_desc "+
-							" ,kpi.kpi_level_id,lv.kpi_level_name "+
-							" ,kpi.kpi_group_id,grp.kpi_group_short_name,grp.kpi_group_name "+
-							" ,kpi.kpi_structure_id,st.kpi_structure_name "+
-							" ,kpi.kpi_type_id,t.kpi_type_name,t.kpi_type_short_name "+
-							" ,kpi.calendar_type_id,c.calendar_type_name "+
-							" ,kpi.period_id,p.period_name "+
-							" ,kpi.kpi_uom_id,uom.kpi_uom_name " +
-							" ,kpi.criteria_type_id " +
-							" ,coalesce(kpi.benchmark_value,0.00) as bv "+
-							" FROM  (select * from kpi where kpi_id = "+kid+" ) kpi  "+
-							" left join kpi_level lv on kpi.kpi_level_id=lv.kpi_level_id "+
-							" left join kpi_group grp on grp.kpi_group_id = kpi.kpi_group_id "+
-							" left join kpi_structure st on st.kpi_structure_id=kpi.kpi_structure_id "+
-							" left join kpi_type t on t.kpi_type_id=kpi.kpi_type_id "+
-							" left join calendar_type c on c.calendar_type_id = kpi.calendar_type_id "+
-							" left join period p on p.period_id = kpi.period_id "+
-							" left join kpi_uom uom on uom.kpi_uom_id = kpi.kpi_uom_id ";
-					Query query = entityManager.createNativeQuery(q1);
-					query.setMaxResults(1);
-					
-					Object[] ob = (Object[]) query.getResultList().get(0);
-					domain.setKpiName((String)ob[1]);
-					domain.setFormulaDesc( (String) ob[2]);
-					domain.setKpiLevelId((Integer)ob[3]);
-					domain.setKpiLevelName((String)ob[4]);
-					domain.setKpiGroupId((Integer)ob[5]);
-					domain.setKpiGroupShortName((String)ob[6]);
-					domain.setKpiGroupName((String)ob[7]);
-					domain.setKpiStructureId((Integer)ob[8]);
-					domain.setKpiStructureName((String)ob[9]);
-					domain.setKpiTypeId((Integer)ob[10]);
-					domain.setKpiTypeName((String)ob[11]);
-					domain.setKpiTypeShortName((String)ob[12]);
-				//	domain.setCalendarTypeId((Integer)ob[13]);
-					domain.setCalendarTypeName((String)ob[14]);
-				//	domain.setPeriodId((Integer)ob[15]);
-					domain.setPeriodName((String)ob[16]);
-					domain.setKpiUomId((Integer)ob[17]);
-					domain.setKpiUomName((String)ob[18]);
-					domain.setCriteriaTypeId((Integer)ob[19]);
-					domain.setBenchmarkValue( ((BigDecimal)ob[20]).doubleValue());
-					// distrubute month 1-21
-
-					for(Integer i = 1;i<=12;i++){
-						KpiResult mm = new KpiResult();
-						BeanUtils.copyProperties(domain, mm);
-						String sqlMonth = "select m from SysMonth m where m.academicYear="+mm.getAcademicYear();
-						if(mm.getCalendarTypeName().equals("ปีปฏิทิน")){
-							sqlMonth = sqlMonth + " and m.calendarMonthNo="+i;
-						}else if(mm.getCalendarTypeName().equals("ปีการศึกษา")){
-							sqlMonth = sqlMonth + " and m.academicMonthNo="+i;
-						}else if(mm.getCalendarTypeName().equals("ปีงบประมาณ")){
-							sqlMonth = sqlMonth + " and m.fiscalMonthNo="+i;
-						}
-					//	System.out.print("sql:"+mm.getCalendarTypeName()+":"+sqlMonth);
-						query = entityManager.createQuery(sqlMonth,SysMonth.class);
-						SysMonth month = (SysMonth) query.getResultList().get(0);
-						mm.setMonthID(month.getMonthId());
-						entityManager.persist(mm);
-					}
-				}
-				success = 1;
-				entityManager.flush();
-			}catch(Exception ex){
-				success = 0;
-				System.out.print(ex);
-			}*/
 			return success ;
 		} 
 		
