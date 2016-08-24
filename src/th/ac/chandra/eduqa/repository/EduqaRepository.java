@@ -981,11 +981,16 @@ public class EduqaRepository   {
 		StringBuffer sb = new StringBuffer("");
 		if (keySearch == null || keySearch.trim().length() <= 0) {
 			keySearch = "";
-		}
+		}				
 		sb.append(" where  kpi.kpi_name like '%" + keySearch.trim()+ "%' and kpi.kpi_level_id="+domain.getLevelId());
 		if(domain.getStructureId()!=null){ sb.append(" and kpi.kpi_structure_id="+domain.getStructureId()); }
 		if(domain.getGroupId()!=null ){	 sb.append(" and kpi.kpi_group_id="+domain.getGroupId()); }
-		if(keyListStatus != null && keyListStatus != "99"){ sb.append(" and kpi.active ="+domain.getActive()); }
+		if(keyListStatus != null && keyListStatus.trim().length() > 0){ 
+			if(!keyListStatus.equals("99")){
+				sb.append(" and kpi.active ="+domain.getActive());
+			}				
+		}
+		
 		String sql = "select s.kpi_structure_id "+
 		" ,s.kpi_structure_name as structureName"+
 		" ,kpi.kpi_id"+
@@ -1032,6 +1037,7 @@ public class EduqaRepository   {
 		transList.add(String.valueOf(results.size()));
 		return transList;
 	}
+	
 	public List<?> getCdsMapWithKpi(CdsResultModel model){
 		String sql = "SELECT distinct kc.cds_id ,cds.cds_name"
 				+ " ,(select cds_value from cds_result where org_id = "+model.getOrgId()+" and month_id = "+model.getMonthId()+" and cds_id = kc.cds_id and row_type = 'header') as cdsValue"
@@ -2122,10 +2128,7 @@ public class EduqaRepository   {
 			String qryStr = "SELECT k FROM KpiResult k WHERE RECOMMEND ='";
 					//+ transientInstance.getResultDesc() + "'";
 			List query = entityManager.createQuery(qryStr).getResultList();
-			/*
-			 * if(query.isEmpty()){ //0=Error, 1=OK
-			 * entityManager.merge(transientInstance); return 1; }else{ return 0; }
-			 */
+
 			entityManager.merge(transientInstance);
 			return 1;
 		}
@@ -2167,10 +2170,11 @@ public class EduqaRepository   {
 					+ " ,(select count(*)from eduqa.kpi_result_detail where result_id = kr.result_id and action_flag = 1) as totalAction  "
 					+ " ,kr.criteria_type_id "
 					+ " from  kpi_result kr  "
-					+ " where org_id = "+domain.getOrgId()+" "
-					+ "and academic_year = "+domain.getAcademicYear()
-					+ " and kpi_group_id = "+domain.getKpiGroupId()+" "
-					+ "and month_id = "+domain.getMonthID() 
+					+ " where kr.active = '1'"
+					+ " and org_id = "+domain.getOrgId()
+					+ " and academic_year = "+domain.getAcademicYear()
+					+ " and kpi_group_id = "+domain.getKpiGroupId()
+					+ " and month_id = "+domain.getMonthID() 
 					+ " order by kr.kpi_structure_id,kr.kpi_name";
 			Query query = entityManager.createNativeQuery(sql);
 			//query.setFirstResult((pagging.getPageNo() - 1) * pagging.getPageSize());
@@ -2219,7 +2223,7 @@ public class EduqaRepository   {
 					+ " ,(select ifnull(max(active),0) from kpi_result r where r.kpi_id = kpi.kpi_id  "
 					+ " and r.academic_year="+model.getAcademicYear()+" and org_id = "+model.getOrgId()+"  ) as used "
 					+ " ,(select cast(max(target_value) as char) from kpi_result where kpi_id = kpi.kpi.kpi_id group by kpi_id) as targetvalue "
-					+ " from (select * from kpi where academic_year = "+model.getAcademicYear()+" and kpi_level_id="+model.getKpiLevelId()+" ) kpi "
+					+ " from (select * from kpi where academic_year = "+model.getAcademicYear()+" and kpi_level_id="+model.getKpiLevelId()+" and active = '1') kpi "
 					+ " left join kpi_structure ks on ks.kpi_structure_id = kpi.kpi_structure_id and ks.academic_year = kpi.academic_year "
 					+ " left join kpi_group grp on kpi.kpi_group_id = grp.kpi_group_id and kpi.academic_year = grp.academic_year "
 					+ " left join calendar_type ct on kpi.calendar_type_id = ct.calendar_type_id  "
@@ -2896,7 +2900,7 @@ public class EduqaRepository   {
 				return deletedCount;
 			}
 			public List<KpiEvidenceModel> searchKpiEvidence(KpiEvidenceModel model){
-				String q1 = "select e.evidence_id , e.evidence_path "
+				String q1 = "select e.evidence_id , e.evidence_path, e.evidence_url_path "
 						+ " from ( select * from kpi_result where kpi_id = "+model.getKpiId()+" "
 								+ " and org_id="+model.getOrgId()+" and month_id = "+model.getMonthId()+") r  "
 						+ " inner join kpi_result_detail rd on r.result_id = rd.result_id "
@@ -2911,6 +2915,7 @@ public class EduqaRepository   {
 					KpiEvidenceModel m = new KpiEvidenceModel();
 					m.setEvidenceId( (Integer)result[0] );
 					m.setEvidencePath( (String)result[1] );
+					m.setEvidenceUrlPath((String)result[2]);
 					rets.add(m);
 				}
 				return rets;

@@ -20,6 +20,8 @@ public class KpiEvidenceModel extends ImakeXML implements Serializable{
 	private Timestamp createdDate;
 	private Timestamp updatedDate;
 	
+	private String evidenceUrlPath;
+	
 	private Integer kpiId;
 	private Integer orgId;
 	private Integer monthId;
@@ -130,6 +132,14 @@ public class KpiEvidenceModel extends ImakeXML implements Serializable{
 
 	public void setCriteriaId(Integer criteriaId) {
 		this.criteriaId = criteriaId;
+	}
+
+	public String getEvidenceUrlPath() {
+		return evidenceUrlPath;
+	}
+
+	public void setEvidenceUrlPath(String evidenceUrlPath) {
+		this.evidenceUrlPath = evidenceUrlPath;
 	}
 	
 }
