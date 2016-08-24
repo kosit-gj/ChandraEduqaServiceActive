@@ -2176,6 +2176,7 @@ public class EduqaRepository   {
 					+ " and kpi_group_id = "+domain.getKpiGroupId()
 					+ " and month_id = "+domain.getMonthID() 
 					+ " order by kr.kpi_structure_id,kr.kpi_name";
+			System.out.println("\n"+sql+"\n");
 			Query query = entityManager.createNativeQuery(sql);
 			//query.setFirstResult((pagging.getPageNo() - 1) * pagging.getPageSize());
 			//query.setMaxResults(pagging.getPageSize());
@@ -2198,12 +2199,14 @@ public class EduqaRepository   {
 				}else{
 					model.setTargetValue( ((BigDecimal) result[8]).doubleValue());
 				}
+				
 				if(result[9]==null){
 					model.setActualValue(null);
 				}else{
 					model.setActualValue( ((BigDecimal) result[9]).doubleValue());
 				}
-				if(result[9]!=null || ((BigInteger)result[10]).intValue()!=0 ){
+				
+				if(result[10]!=null && ((BigInteger)result[10]).intValue()!=0 ){
 						model.setHasResult("1");
 				}else{
 					model.setHasResult("0");
